@@ -1,77 +1,80 @@
-## 🧰 Windows Maintenance - RichyKunBv
+# 🧰 Mantenix v3.0
 
-**Repositorio:** `Windows_Maintenance`
-**Autor:** [RichyKunBv](https://github.com/RichyKunBv)
-**Archivos incluidos:**
-
-* `Mantenimiento.bat` – script principal₃
-* `Mantenimiento.exe` – ejecutable para mayor comodidad₃
+**Autor:** [RichyKunBv](https://github.com/RichyKunBv)  
+**Repositorio:** `Mantenix-Windows-Edition`  
+**Versión Actual:** 3.0
 
 ---
 
-### 🖥️ ¿Qué es esto?
+### 🖥️ ¿Qué es Mantenix?
 
-Un script de mantenimiento para Windows que agrupa múltiples herramientas del sistema en un menú interactivo. Ideal para mantener tu PC limpia, rápida y estable sin instalar nada adicional.
-
----
-
-### 🚀 Instrucciones de uso
-
-1. Descarga el repositorio. (ojo algunas veces al momento de descargar va a poner este aviso, solo presiona los tres puntos y en conservar)
-
-![Captura de pantalla 2025-06-20 191347](https://github.com/user-attachments/assets/8ab94073-82e5-4c8f-8468-c8b43dbb173a)
-
-2. ₃ Ejecuta `Mantenimiento.exe` o `Mantenimiento.bat` como **Administrador**. (OJO Si ves una alerta de seguridad, pulsa en "Más información" y "Ejecutar", te garantizo que la aplicación es segura)
-
-![Captura de pantalla 2025-06-03 171134](https://github.com/user-attachments/assets/bb2ebf9f-cb0d-44e8-ab16-d6dfedcac843)   
-
-3. Selecciona una opción del menú (1 a 6).
-4. Espera a que finalicen los procesos. Algunos pueden tardar.
+**Mantenix** es una suite de herramientas todo-en-uno para el mantenimiento de Windows, diseñada para ser potente, inteligente y fácil de usar. Agrupa múltiples utilidades del sistema en un menú interactivo, ideal para limpiar, optimizar y asegurar tu PC sin necesidad de instalar software adicional.
 
 ---
 
-### 📋 Opciones del menú
+### ✨ Características Principales de la v3.0
 
-<img width="410" height="328" alt="Captura de pantalla 2025-07-13 224212" src="https://github.com/user-attachments/assets/fed0335e-41dc-406e-9fb1-5c0b61466a48" />
+* **Optimización Inteligente:** Mantenix detecta automáticamente si tus unidades de almacenamiento son **HDD o SSD**. Aplica la desfragmentación tradicional a los discos duros y la optimización TRIM (más segura y recomendada) a las unidades de estado sólido.
+* **Ejecución Segura:** Comprueba si tiene permisos de administrador al inicio y, si no, intenta re-lanzarse para asegurar que todas las funciones operen correctamente.
+* **Herramientas Avanzadas:** Incluye un nuevo módulo con herramientas para gestionar programas de arranque, limpiar drivers antiguos y mejorar tu privacidad.
+* **Actualizador Integrado:** Revisa si hay nuevas versiones en GitHub y te permite actualizar la aplicación fácilmente.
+
+---
+
+### 🚀 Instrucciones de Uso
+
+1.  Ve a la sección de **[Releases](https://github.com/RichyKunBv/Mantenix-Windows-Edition/releases)** y descarga la última versión (`MantenixW.bat` o `Mantenix.exe`).
+2.  Tu navegador podría mostrar una advertencia de seguridad por ser un archivo poco común. Simplemente haz clic en los tres puntos y selecciona "Conservar". ¡Es seguro!
+
+    ![Advertencia de descarga del navegador](https://github.com/user-attachments/assets/8ab94073-82e5-4c8f-8468-c8b43dbb173a)
+
+3.  Haz clic derecho en el archivo descargado y selecciona **"Ejecutar como administrador"**.
+4.  Si aparece la pantalla de seguridad de Windows, haz clic en "Más información" y luego en "Ejecutar de todas formas".
+
+    ![Advertencia de Windows SmartScreen](https://github.com/user-attachments/assets/bb2ebf9f-cb0d-44e8-ab16-d6dfedcac843)
+5.  ¡Listo! Navega por el menú usando los números y sigue las instrucciones en pantalla.
+
+---
+
+### 📋 Opciones del Menú v3.0
+
+<img width="591" height="508" alt="image" src="https://github.com/user-attachments/assets/4a3f1967-acda-4cbc-a348-4ec2a8f129c6" />
+
 
 #### 1. ✅ Revisión del sistema
-
-* Ejecuta `sfc /scannow` y DISM para revisar y reparar archivos del sistema.
+Ejecuta `sfc /scannow` y `DISM` para analizar y reparar la integridad de los archivos esenciales de Windows.
 
 #### 2. 🔧 Limpieza básica
+Realiza una optimización inteligente de tus discos (Defrag para HDD, TRIM para SSD) y una comprobación de errores del sistema de archivos con `chkdsk`.
 
-* Desfragmenta discos duros y revisa el sistema de archivos con `chkdsk`.
+#### 3. 🧼 Limpieza completa
+Una rutina más profunda que elimina archivos temporales, restablece la configuración de red (DNS, Firewall, etc.) y crea un punto de restauración para mayor seguridad.
 
-#### 3. 🧼 Limpieza completa ₁
+#### 4. 🔍 Análisis completo
+Ejecuta de forma secuencial y automatizada todas las tareas de revisión y limpieza (1, 2 y 3).
 
-* Elimina archivos temporales, reinicia configuración de red, limpia DNS, firewall, arranque y más.
-* Crea un punto de restauración automático por si algo sale mal.
+#### 5. 🛠️ Herramientas Avanzadas
+Abre un sub-menú con nuevas y potentes utilidades:
+* **Gestor de Arranque:** Lista los programas que inician con Windows y te da acceso a las herramientas del sistema para gestionarlos.
+* **Limpieza de Drivers:** Lanza la utilidad de Windows para eliminar de forma segura paquetes de controladores antiguos y liberar espacio.
+* **Módulo de Privacidad:** Aplica cambios para reducir la telemetría y recolección de datos de Windows.
 
-#### 4. 🔍 Análisis completo ₁
+#### 6. ⬆️ Actualizar Mantenix
+Comprueba si hay una nueva versión en GitHub y te guía en el proceso de actualización.
 
-* Ejecuta todo lo anterior de forma automatizada: revisión, limpieza básica y profunda.
+<img width="576" height="332" alt="image" src="https://github.com/user-attachments/assets/9fdefb35-1869-4131-8d54-d592ac695942" />
 
-#### 5. 🚪 Salir
 
-* Cierra el programa y abre el repositorio en GitHub.
-
-#### 6. Actualizar App. ₄
-
-* La aplicacion se actualiza automaticamente con un simple clic
-
-<img width="465" height="302" alt="Captura de pantalla 2025-07-13 224253" src="https://github.com/user-attachments/assets/2f08bcde-b68b-4b60-a880-331a700640dc" />
-
-![Captura de pantalla 2025-06-27 213505](https://github.com/user-attachments/assets/e5be7d88-2994-4974-a70c-2f461e37b53b)
-
+#### 7. 🚪 Salir
+Cierra el programa y abre la página del proyecto en GitHub.
 
 ---
 
-### ⚠️ Notas
+### ⚠️ Notas Importantes
 
-* ₁ Usa la opción 3 o 4 al menos una vez al mes para mantener tu sistema sano.
-* ₂ No se recomienda usar `defrag` si solo tienes SSD (puedes editar el script para quitarlo).
-* ₃ El `.exe` es una adaptacion del `.bat`, pensado para facilitar su ejecución en usuarios sin conocimientos técnicos.
-* ₄ La opcion 6 necesita obligatoriamente internet para descargar la ultima version disponible en GitHub
-
----
-
+* **Ejecutar como Administrador:** Es crucial para que las herramientas de sistema funcionen correctamente.
+* **Puntos de Restauración:** La limpieza completa crea un punto de restauración, pero siempre es buena idea tener un respaldo de tus datos importantes.
+* **Diferencia entre `.bat` y `.exe`:**
+    * `MantenixW.bat`: Es el script de código abierto. Su actualizador es **totalmente automático** (se reemplaza a sí mismo).
+    * `Mantenix.exe`: Es el script compilado para mayor comodidad. Por seguridad y para evitar falsos positivos de antivirus, su actualizador **descarga la nueva versión** en tu carpeta de "Descargas" y te avisa para que tú la reemplaces manualmente.
+* **Conexión a Internet:** La función de actualizar necesita conexión a internet para contactar con GitHub.
