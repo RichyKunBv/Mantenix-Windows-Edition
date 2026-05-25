@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-title Mantenix v3.1 - por RichyKunBv
+title Mantenix v3.1 Beta - por RichyKunBv
 color 0A
 
 REM --- ========================================================== ---
@@ -47,7 +47,7 @@ if defined winBuild if %winBuild% GEQ 22000 set "osName=%osName:10=11%"
 :MENU
 cls
 echo =============================================================
-echo                       MANTENIX v%AppVersion%
+echo                  MANTENIX v%AppVersion% Beta
 echo =============================================================
 echo.
 echo   Editor: RichyKunBv
@@ -61,7 +61,7 @@ echo   2. Limpieza basica
 echo   3. Limpieza completa
 echo   4. Analisis completo
 echo.
-echo -------------------- NUEVAS FUNCIONES -----------------------
+echo -------------------- FUNCIONES EXTRAS -----------------------
 echo.
 echo   5. Herramientas Avanzadas
 echo.
@@ -108,18 +108,22 @@ for %%d in (%drives_to_check%) do (
     if exist %%d:\ (
         echo [INFO] Comprobando unidad %%d:
         set "driveType=UNKNOWN"
-        for /f "delims=" %%t in ('powershell -Command "try { Get-Partition -DriveLetter %%d | Get-PhysicalDisk | Select-Object -ExpandProperty MediaType } catch { Write-Host 'UNKNOWN' }"') do (
+
+        for /f "delims=" %%t in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Get-PhysicalDisk | Where-Object { $_.DeviceId -eq (Get-Partition -DriveLetter '%%d').DiskNumber } | Select-Object -ExpandProperty MediaType } catch { Write-Host 'UNKNOWN' }"') do (
             set "driveType=%%t"
         )
-        if /i "!driveType!"=="HDD" (
-            echo [OK]   Unidad %%d: es un HDD. Se desfragmentara.
-            defrag %%d: /O
-        ) else if /i "!driveType!"=="SSD" (
+
+        if /i "!driveType!"=="SSD" (
             echo [OK]   Unidad %%d: es un SSD. Se optimizara con TRIM.
             defrag %%d: /L /O
+        ) else if /i "!driveType!"=="HDD" (
+            echo [OK]   Unidad %%d: es un HDD. Se desfragmentara.
+            defrag %%d: /O
         ) else (
-            echo [WARN] No se pudo determinar el tipo de la unidad %%d:. Se omitira la optimizacion.
+            echo [WARN] No se pudo determinar el tipo de la unidad %%d:. Se aplicara optimizacion generica.
+            defrag %%d: /O
         )
+
         echo [INFO] Realizando chequeo de errores en la unidad %%d:...
         chkdsk %%d: /scan
         echo.
@@ -288,21 +292,37 @@ echo =============================================================
 echo                ACTIVAR MÁXIMO RENDIMIENTO
 echo =============================================================
 echo.
-echo [INFO] Esta opción ajustará la configuración de energía de Windows
+echo [INFO] Esta opción ajustara la configuracion de energía de Windows
 echo        al plan de "Máximo Rendimiento".
 echo.
 set /p "doRendimiento=Deseas continuar? (S/N): "
 if /i not "%doRendimiento%"=="S" goto HERRAMIENTAS_AVANZADAS
 if /i not "%doRendimiento%"=="SI" goto HERRAMIENTAS_AVANZADAS
 echo.
-echo Activando plan de Máximo Rendimiento...
-powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61
-powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+echo [INFO] Intentando activar plan "Máximo Rendimiento"...
+powercfg /setactive e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
 if %errorlevel% equ 0 (
-    echo [OK] Plan de Máximo Rendimiento activado.
-) else (
-    echo [WARN] No se pudo activar el plan. Es posible que no esté disponible en este equipo.
+    echo [OK] Plan Máximo Rendimiento activado.
+    goto :RendimientoFin
 )
+echo [WARN] El plan Máximo Rendimiento no está disponible. Intentando añadirlo...
+powercfg -duplicatescheme e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+if %errorlevel% equ 0 (
+    powercfg /setactive e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
+    echo [OK] Plan Máximo Rendimiento añadido y activado.
+    goto :RendimientoFin
+)
+
+echo [INFO] No se pudo habilitar Máximo Rendimiento.
+echo        Activando plan "Alto Rendimiento" en su lugar...
+powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [OK] Plan Alto Rendimiento activado.
+) else (
+    echo [ERROR] No se pudo activar ningún plan de alto rendimiento.
+)
+
+:RendimientoFin
 echo.
 pause
 goto HERRAMIENTAS_AVANZADAS
