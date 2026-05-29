@@ -4,13 +4,13 @@ title Mantenix v3.1 Beta - por RichyKunBv
 color 0A
 
 REM --- ========================================================== ---
-REM ---                 VARIABLE DE VERSIÓN ÚNICA                  ---
+REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
 set "AppVersion=3.1"
 
 
 REM --- ========================================================== ---
-REM ---        COMPROBACIÓN INICIAL DE PERMISOS (ADMIN)            ---
+REM ---        COMPROBACION INICIAL DE PERMISOS (ADMIN)            ---
 REM --- ========================================================== ---
 net session >nul 2>&1
 if %errorLevel% neq 0 (
@@ -22,7 +22,7 @@ if %errorLevel% neq 0 (
 
 
 REM --- ========================================================== ---
-REM ---          OBTENCIÓN DE INFORMACIÓN DEL SISTEMA              ---
+REM ---          OBTENCION DE INFORMACION DEL SISTEMA              ---
 REM --- ========================================================== ---
 set "osName="
 for /f "tokens=3*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v "ProductName"') do set "osName=%%a %%b"
@@ -34,7 +34,7 @@ if defined winBuild (
     if %winBuild% LSS 10240 (
         echo [ERROR] Mantenix v%AppVersion% solo es compatible con Windows 10 y Windows 11.
         echo         Se ha detectado: %osName% ^(Build %winBuild%^)
-        echo         El programa se cerrará.
+        echo         El programa se cerrara.
         pause
         exit /b 1
     )
@@ -96,6 +96,22 @@ DISM /Online /Cleanup-Image /RestoreHealth
 echo. & echo [OK] Tarea de Revision completada. & pause
 exit /b
 
+:REINICIAR_WINUP
+echo [INFO] Reiniciando servicios de actualizacion de Windows...
+net stop wuauserv
+net stop cryptSvc
+net stop bits
+net stop msiserver
+
+ren C:\Windows\SoftwareDistribution SoftwareDistribution.old
+ren C:\Windows\System32\catroot2 catroot2.old
+
+net start wuauserv
+net start cryptSvc
+net start bits
+net start msiserver
+exit /b         
+
 
 :LIMPIEZA_BASICA
 cls
@@ -137,7 +153,7 @@ exit /b
 cls
 echo [TAREA] Limpieza completa: temporales, red, firewall y mas...
 echo.
-REM --- Comprobación Inteligente de Batería ---
+REM --- Comprobacion Inteligente de Bateria ---
 echo [INFO] Verificando estado de la alimentacion electrica...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "if (Get-CimInstance -ClassName Win32_Battery -ErrorAction SilentlyContinue) { $chargeStatus = (Get-CimInstance -ClassName Win32_Battery).BatteryStatus; if ($chargeStatus -ne 2) { Write-Host '[!] ADVERTENCIA: La laptop esta funcionando con bateria.'; pause } else { Write-Host '[OK]   La laptop esta conectada a la corriente.' } } else { Write-Host '[OK]   PC de escritorio detectada.' }"
 echo.
@@ -154,6 +170,8 @@ tasklist | findstr /I /C:"malware" /C:"virus"
 wmic startup get caption,command
 echo Comprobando estado fisico del disco...
 wmic diskdrive get status
+echo Reiniciando servicios de actualizacion de Windows...
+call :REINICIAR_WINUP
 echo. & echo [OK] Tarea de Limpieza Completa finalizada. & pause
 exit /b
 
@@ -163,6 +181,7 @@ cls
 echo [TAREA] Analisis completo: ejecutando TODO el mantenimiento...
 echo.
 call :REVISION
+call :REINICIAR_WINUP
 call :LIMPIEZA_BASICA
 call :LIMPIEZA_COMPLETA
 echo. & echo [OK] Analisis completo finalizado. & pause
@@ -236,8 +255,9 @@ echo [INFO] Se utilizara la herramienta oficial de Windows para garantizar
 echo        un proceso seguro.
 echo.
 set /p "doDriverClean=Deseas continuar? (S/N): "
-if /i not "%doDriverClean%"=="S" goto HERRAMIENTAS_AVANZADAS
-if /i not "%doDriverClean%"=="SI" goto HERRAMIENTAS_AVANZADAS
+if /i not "%doDriverClean%"=="S" (
+    if /i not "%doDriverClean%"=="SI" goto HERRAMIENTAS_AVANZADAS
+)
 echo.
 echo [INFO] Se abrira el Liberador de Espacio en Disco. Por favor,
 echo        asegurate de marcar la casilla "Paquetes de controladores de dispositivo"
@@ -263,8 +283,9 @@ echo     servicios de Windows para reducir la recoleccion de datos
 echo     (telemetria) por parte de Microsoft.
 echo.
 set /p "doPrivacy=Estas seguro de que deseas aplicar estos cambios? (S/N): "
-if /i not "%doPrivacy%"=="S" goto HERRAMIENTAS_AVANZADAS
-if /i not "%doPrivacy%"=="SI" goto HERRAMIENTAS_AVANZADAS
+if /i not "%doPrivacy%"=="S" (
+    if /i not "%doPrivacy%"=="SI" goto HERRAMIENTAS_AVANZADAS
+)
 echo.
 echo [INFO] Aplicando configuraciones de privacidad...
 echo.
@@ -279,7 +300,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enab
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v CortanaEnabled /t REG_DWORD /d 0 /f >nul 2>&1
 echo [OK]
 echo.
-echo [OK]   ¡Configuraciones de privacidad aplicadas con exito!
+echo [OK]   Configuraciones de privacidad aplicadas con exito!
 echo [INFO] Se recomienda reiniciar el equipo para que todos los
 echo        cambios surtan efecto.
 echo.
@@ -289,37 +310,38 @@ goto HERRAMIENTAS_AVANZADAS
 :MAXIMO_RENDIMIENTO
 cls
 echo =============================================================
-echo                ACTIVAR MÁXIMO RENDIMIENTO
+echo                ACTIVAR MAXIMO RENDIMIENTO
 echo =============================================================
 echo.
-echo [INFO] Esta opción ajustara la configuracion de energía de Windows
-echo        al plan de "Máximo Rendimiento".
+echo [INFO] Esta opcion ajustara la configuracion de energia de Windows
+echo        al plan de "Maximo Rendimiento".
 echo.
 set /p "doRendimiento=Deseas continuar? (S/N): "
-if /i not "%doRendimiento%"=="S" goto HERRAMIENTAS_AVANZADAS
-if /i not "%doRendimiento%"=="SI" goto HERRAMIENTAS_AVANZADAS
+if /i not "%doRendimiento%"=="S" (
+    if /i not "%doRendimiento%"=="SI" goto HERRAMIENTAS_AVANZADAS
+)
 echo.
-echo [INFO] Intentando activar plan "Máximo Rendimiento"...
+echo [INFO] Intentando activar plan "Maximo Rendimiento"...
 powercfg /setactive e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
 if %errorlevel% equ 0 (
-    echo [OK] Plan Máximo Rendimiento activado.
+    echo [OK] Plan Maximo Rendimiento activado.
     goto :RendimientoFin
 )
-echo [WARN] El plan Máximo Rendimiento no está disponible. Intentando añadirlo...
+echo [WARN] El plan Maximo Rendimiento no esta disponible. Intentando anadirlo...
 powercfg -duplicatescheme e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
 if %errorlevel% equ 0 (
     powercfg /setactive e9a42be2-d5df-448d-aa00-03f14749eb61 >nul 2>&1
-    echo [OK] Plan Máximo Rendimiento añadido y activado.
+    echo [OK] Plan Maximo Rendimiento anadido y activado.
     goto :RendimientoFin
 )
 
-echo [INFO] No se pudo habilitar Máximo Rendimiento.
+echo [INFO] No se pudo habilitar Maximo Rendimiento.
 echo        Activando plan "Alto Rendimiento" en su lugar...
 powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
 if %errorlevel% equ 0 (
     echo [OK] Plan Alto Rendimiento activado.
 ) else (
-    echo [ERROR] No se pudo activar ningún plan de alto rendimiento.
+    echo [ERROR] No se pudo activar ningun plan de alto rendimiento.
 )
 
 :RendimientoFin
@@ -403,9 +425,9 @@ echo   Desarrollado por: RichyKunBv
 echo   GitHub: https://github.com/RichyKunBv/Mantenix-Windows-Edition
 echo.
 echo   Mantenix es una suite de herramientas todo-en-uno para el
-echo   mantenimiento de Windows, diseñada para ser potente, inteligente
-echo   y fácil de usar. Agrupa múltiples utilidades del sistema en un
-echo   menú interactivo, ideal para limpiar, optimizar y asegurar 
+echo   mantenimiento de Windows, disenada para ser potente, inteligente
+echo   y facil de usar. Agrupa multiples utilidades del sistema en un
+echo   menu interactivo, ideal para limpiar, optimizar y asegurar 
 echo   tu PC sin necesidad de instalar software adicional.
 echo.
 pause
