@@ -6,7 +6,7 @@ color 0A
 REM --- ========================================================== ---
 REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
-set "AppVersion=3.1"
+set "AppVersion=3.1.0.1"
 
 
 REM --- ========================================================== ---
@@ -164,12 +164,12 @@ cleanmgr /sagerun:1
 echo Borrando temporales...
 del /s /q %temp%\*.* 2>nul & del /s /q C:\Windows\Temp\*.* 2>nul
 echo Creando punto de restauracion...
-wmic.exe /Namespace:\\root\default Path SystemRestore Call CreateRestorePoint "Mantenix - Limpieza Completa", 100, 7
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Checkpoint-Computer -Description 'Mantenix - Limpieza Completa' -RestorePointType MODIFY_SETTINGS" >nul 2>&1
 echo Verificando procesos y arranque...
 tasklist | findstr /I /C:"malware" /C:"virus"
-wmic startup get caption,command
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_StartupCommand | Select-Object Caption, Command, User | Format-Table -AutoSize"
 echo Comprobando estado fisico del disco...
-wmic diskdrive get status
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PhysicalDisk | ForEach-Object { Write-Host \"$($_.FriendlyName): $($_.OperationalStatus)\" }"
 echo Reiniciando servicios de actualizacion de Windows...
 call :REINICIAR_WINUP
 echo. & echo [OK] Tarea de Limpieza Completa finalizada. & pause
@@ -221,7 +221,7 @@ echo.
 echo [INFO] A continuacion se listan los programas que inician con Windows:
 echo -------------------------------------------------------------
 echo.
-wmic startup get Caption, Command, User
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_StartupCommand | Select-Object Caption, Command, User, Location | Format-Table -AutoSize"
 echo.
 echo -------------------------------------------------------------
 echo.
