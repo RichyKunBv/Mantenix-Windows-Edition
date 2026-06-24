@@ -4,8 +4,8 @@
 # Tambien como yo trabajo en macOS los comandos son en UNIX y no funconarian bien en Linux y mucho menos en Windows
 
     nombre="Mantenix-Windows-Edition"
-    repo_url="https://github.com/RichyKunBv/Mantenix-Windows-Edition.git"
-    ubicacion="$HOME/Mantenix-Windows-Edition"
+    repo_url="https://github.com/RichyKunBv/$nombre.git"
+    ubicacion="$HOME/$nombre"
 
 if [ -d "$ubicacion" ]; then
     cd "$ubicacion"
@@ -57,6 +57,12 @@ configurar() {
     echo "Nota: Al hacer tu primer 'push', te va a pedir tus credenciales como nombre de usuario, correo y contraseña (la contraseña no es la de tu cuenta es un Token de Acceso Personal que se genera en las configuraciones de GitHub)."
 }
 
+# Clonar
+clonar() {
+    echo -e "\nClonando el repositorio..."
+    git clone "$repo_url"
+}
+
 # Pausa interactiva
 press_any_key() {
     echo -e "\nPulsa cualquier tecla para volver al menú..."
@@ -69,6 +75,7 @@ show_menu() {
     echo -e "   1) Actualizar local (Pull)"
     echo -e "   2) Actualizar el repo (Push)"
     echo -e "   0) Configurar"
+    echo -e "   9) Clonar"
     echo -e "   X) Salir"
     read -p "   >> Introduce tu elección: " choice
     echo ""
@@ -77,6 +84,7 @@ show_menu() {
         1) descargar; press_any_key ;;
         2) publicar; press_any_key ;;
         0) configurar; press_any_key ;;
+        9) clonar; press_any_key ;;
         X|x) echo "Saliendo... ¡Hasta pronto!"; exit 0 ;;
         *) echo "Opción inválida. Por favor, intenta de nuevo."; sleep 2 ;;
     esac
