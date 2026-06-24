@@ -78,3 +78,21 @@ Cierra el programa y abre la página del proyecto en GitHub.
     * `MantenixW.bat`: Es el script de código abierto. Su actualizador es **totalmente automático** (se reemplaza a sí mismo).
     * `Mantenix.exe`: Es el script compilado para mayor comodidad. Por seguridad y para evitar falsos positivos de antivirus, su actualizador **descarga la nueva versión** en tu carpeta de "Descargas" y te avisa para que tú la reemplaces manualmente.
 * **Conexión a Internet:** La función de actualizar necesita conexión a internet para contactar con GitHub.
+
+---
+
+<details>
+<summary>TESTS</summary>
+
+## Entornos de Prueba
+
+Este proyecto ha sido probado y verificado en las siguientes configuraciones de hardware y software:
+
+| Sistema Operativo | Arquitectura / CPU | Memoria RAM | Notas |
+| :--- | :--- | :--- | :--- |
+| Windows 11 Home | x86_64 / i7-1255U | 16 GB |   |
+| Windows 10 Pro | x86_64 / i5-4200M | 16 GB | Actualizaciones de Seguridad Extendidas |
+| Windows 10 Pro | x86_64 / i5-3230M | 12 GB | Actualizaciones de Seguridad Extendidas |
+| Windows 11 Pro | ARM / M1 | 4 GB | Maquina virtual VMware Fusion |
+
+</details>
