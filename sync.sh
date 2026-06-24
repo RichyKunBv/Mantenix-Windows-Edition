@@ -3,8 +3,12 @@
 # es para hacer una mini sincronizacion, realmente ignorenlo ya que es algo mas para mi que para ustedes, nada mas para mas agilidad
 # Tambien como yo trabajo en macOS los comandos son en UNIX y no funconarian bien en Linux y mucho menos en Windows
 
-if [ -d "$HOME/Mantenix-Windows-Edition" ]; then
-    cd "$HOME/Mantenix-Windows-Edition"
+    nombre="Mantenix-Windows-Edition"
+    repo_url="https://github.com/RichyKunBv/Mantenix-Windows-Edition.git"
+    ubicacion="$HOME/Mantenix-Windows-Edition"
+
+if [ -d "$ubicacion" ]; then
+    cd "$ubicacion"
 fi
 
 descargar() {
@@ -31,31 +35,26 @@ publicar() {
 # Configuración inicial del entorno
 configurar() {
     clear
-    echo "=== Clonar y Configurar Entorno de Ultraudio ==="
+    echo "=== Clonar y Configurar Entorno de $nombre ==="
 
-    if [ ! -d "$HOME/Ultraudio" ]; then
+    if [ ! -d "$ubicacion" ]; then
         echo -e "\n Descargando el código..."
         cd "$HOME" || return
-        git clone https://github.com/RichyKunBv/Mantenix-Windows-Edition.git
+        git clone "$repo_url"
     else
         echo -e "\n La carpeta ya existe. Saltando la clonación..."
     fi
     
-    cd "$HOME/Mantenix-Windows-Edition" || { echo "Error al entrar a la carpeta"; return; }
+    cd "$ubicacion" || { echo "Error al entrar a la carpeta"; return; }
 
     echo ""
-    read -p "   >> Introduce tu nombre de usuario: " usuario
-    read -p "   >> Introduce tu correo de GitHub: " correo
 
-    echo -e "\n Configurando la identidad y el editor..."
+    echo -e "\n Configurando editor..."
 
-    git config --global user.name "$usuario"
-    git config --global user.email "$correo"
     git config --global core.editor "nano"
-    git config --global credential.helper osxkeychain
 
-    echo -e "\n ¡Entorno de Ultraudio configurado y listo para programar!"
-    echo "Nota: Al hacer tu primer 'push', usa tu Token (PAT) como contraseña."
+    echo -e "\n ¡Entorno de $nombre configurado y listo para programar!"
+    echo "Nota: Al hacer tu primer 'push', te va a pedir tus credenciales como nombre de usuario, correo y contraseña (la contraseña no es la de tu cuenta es un Token de Acceso Personal que se genera en las configuraciones de GitHub)."
 }
 
 # Pausa interactiva
