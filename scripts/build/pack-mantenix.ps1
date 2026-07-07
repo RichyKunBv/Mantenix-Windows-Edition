@@ -44,13 +44,6 @@ if (-not $batToExe) {
     $batToExe = Get-Command 'bat-to-exe-converter' -ErrorAction SilentlyContinue
 }
 
-if (-not $batToExe) {
-    $choco = Get-Command 'choco' -ErrorAction SilentlyContinue
-    if ($choco) {
-        & choco install bat-to-exe-converter -y --no-progress
-    }
-}
-
 $tool = $null
 $possiblePaths = @(
     'C:\Program Files\Bat To Exe Converter\bat-to-exe.exe',
@@ -64,10 +57,6 @@ foreach ($p in $possiblePaths) {
         $tool = $p
         break
     }
-}
-
-if (-not $tool) {
-    throw 'No se pudo localizar Bat To Exe Converter en el sistema.'
 }
 
 $workDir = Join-Path $root '.tmp-mantenix-pack'
@@ -104,27 +93,118 @@ $batContent = Get-Content $batPath -Raw -Encoding Ascii
 $batTemp = Join-Path $workDir 'MantenixWforEXE.bat'
 Set-Content -Path $batTemp -Value $batContent -Encoding Ascii
 
-$argList = @(
-    '/bat', $batTemp,
-    '/exe', $outPath,
-    '/icon', $iconPath,
-    '/x86',
-    '/nopause',
-    '/silent'
-)
+if ($tool) {
+    $argList = @(
+        '/bat', $batTemp,
+        '/exe', $outPath,
+        '/icon', $iconPath,
+        '/x86',
+        '/nopause',
+        '/silent'
+    )
 
-& $tool @argList
+    & $tool @argList
 
-if (-not (Test-Path $outPath)) {
-    throw "El proceso no generó $outPath"
+    if (-not (Test-Path $outPath)) {
+        throw "El proceso no generó $outPath"
+    }
+}
+else {
+    $dotnet = Get-Command 'dotnet' -ErrorAction SilentlyContinue
+    if (-not $dotnet) {
+        throw 'No se pudo localizar Bat To Exe Converter ni dotnet en el sistema.'
+    }
+
+    $launcherProjectDir = Join-Path $workDir 'launcher'
+    New-Item -ItemType Directory -Path $launcherProjectDir -Force | Out-Null
+
+    $launcherCsproj = @'
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>MantenixW</AssemblyName>
+    <UseAppHost>true</UseAppHost>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+</Project>
+'@
+    Set-Content -Path (Join-Path $launcherProjectDir 'MantenixW.csproj') -Value $launcherCsproj -Encoding UTF8
+
+    $launcherSource = @'
+using System;
+using System.Diagnostics;
+using System.IO;
+
+internal static class Program
+{
+    private static int Main(string[] args)
+    {
+        string batchPath = @"__BATCH_PATH__";
+        if (!File.Exists(batchPath))
+        {
+            Console.Error.WriteLine($"No se encontró el archivo por lotes: {batchPath}");
+            return 1;
+        }
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            Arguments = $"/c \"{batchPath}\"",
+            WorkingDirectory = Path.GetDirectoryName(batchPath) ?? Environment.CurrentDirectory,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        try
+        {
+            using var process = Process.Start(startInfo);
+            if (process is null)
+            {
+                return 1;
+            }
+
+            process.WaitForExit();
+            return process.ExitCode;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            return 1;
+        }
+    }
+}
+'@
+    $launcherSource = $launcherSource.Replace('__BATCH_PATH__', $batTemp)
+    Set-Content -Path (Join-Path $launcherProjectDir 'Program.cs') -Value $launcherSource -Encoding UTF8
+
+    Push-Location $launcherProjectDir
+    & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -p:SelfContained=false -o $workDir | Out-Null
+    Pop-Location
+
+    $fallbackExe = Join-Path $workDir 'MantenixW.exe'
+    if (-not (Test-Path $fallbackExe)) {
+        throw 'No se pudo generar el ejecutable alternativo con dotnet.'
+    }
+
+    Copy-Item $fallbackExe $outPath -Force
 }
 
 $rcedit = Get-Command 'rcedit' -ErrorAction SilentlyContinue
 if (-not $rcedit) {
     $choco = Get-Command 'choco' -ErrorAction SilentlyContinue
     if ($choco) {
-        & choco install rcedit -y --no-progress
-        $rcedit = Get-Command 'rcedit' -ErrorAction SilentlyContinue
+        try {
+            & choco install rcedit -y --no-progress | Out-Null
+            $rcedit = Get-Command 'rcedit' -ErrorAction SilentlyContinue
+        }
+        catch {
+            Write-Warning "No se pudo instalar rcedit: $($_.Exception.Message)"
+        }
     }
 }
 

@@ -17,10 +17,10 @@ jobs:
       - name: Obtener código fuente
         uses: actions/checkout@v4
 
-      - name: Instalar convertidor de Batch a EXE
-        shell: powershell
-        run: |
-          choco install bat-to-exe-converter -y --no-progress
+      - name: Configurar .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Crear MantenixW.exe con icono y elevación
         shell: powershell
