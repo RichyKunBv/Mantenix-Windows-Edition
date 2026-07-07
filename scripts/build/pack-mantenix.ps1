@@ -182,13 +182,53 @@ internal static class Program
     $launcherSource = $launcherSource.Replace('__BATCH_PATH__', $batTemp)
     Set-Content -Path (Join-Path $launcherProjectDir 'Program.cs') -Value $launcherSource -Encoding UTF8
 
-    Push-Location $launcherProjectDir
-    & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -p:SelfContained=false -o $workDir | Out-Null
-    Pop-Location
+    $publishDir = Join-Path $workDir 'publish'
+    New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
 
-    $fallbackExe = Join-Path $workDir 'MantenixW.exe'
-    if (-not (Test-Path $fallbackExe)) {
-        throw 'No se pudo generar el ejecutable alternativo con dotnet.'
+    Push-Location $launcherProjectDir
+    try {
+        & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -p:SelfContained=false -o $publishDir
+        if ($LASTEXITCODE -ne 0) {
+            throw "dotnet publish terminó con código de salida $LASTEXITCODE"
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+    $generatedFiles = @(Get-ChildItem -Path $workDir -Recurse -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    Write-Host "Archivos generados por dotnet publish:"
+    foreach ($file in $generatedFiles) {
+        Write-Host " - $file"
+    }
+
+    $fallbackExe = $null
+    $candidatePaths = @(
+        (Join-Path $publishDir 'MantenixW.exe'),
+        (Join-Path $publishDir 'MantenixW'),
+        (Join-Path $publishDir 'MantenixWLauncher.exe'),
+        (Join-Path $publishDir 'MantenixWLauncher'),
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixW.exe'),
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixW'),
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixWLauncher.exe'),
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixWLauncher')
+    )
+
+    foreach ($candidate in $candidatePaths) {
+        if ($candidate -and (Test-Path $candidate)) {
+            $fallbackExe = $candidate
+            break
+        }
+    }
+
+    if (-not $fallbackExe) {
+        $fallbackExe = @(Get-ChildItem -Path $workDir -Recurse -File -Filter '*.exe' -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'MantenixW|MantenixWLauncher' } |
+            Select-Object -ExpandProperty FullName -First 1)
+    }
+
+    if (-not $fallbackExe) {
+        throw "No se pudo generar el ejecutable alternativo con dotnet. Archivos generados: $($generatedFiles -join ', ')"
     }
 
     Copy-Item $fallbackExe $outPath -Force
