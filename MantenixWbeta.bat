@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Mantenix v3.1 Beta - por RichyKunBv
+title Mantenix v3.1.1 Beta - por RichyKunBv
 color 0A
 
 REM --- ========================================================== ---
 REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
-set "AppVersion=3.1.0.1"
+set "AppVersion=3.1.1"
 
 
 REM --- ========================================================== ---
@@ -74,10 +74,26 @@ echo   9. Salir
 echo.
 set /p opcion=Selecciona una opcion:
 
-if "%opcion%"=="1" call :REVISION
-if "%opcion%"=="2" call :LIMPIEZA_BASICA
-if "%opcion%"=="3" call :LIMPIEZA_COMPLETA
-if "%opcion%"=="4" goto ANALISIS_COMPLETO
+if "%opcion%"=="1" (
+    call :REVISION
+    call :TAREA_FINALIZADA
+    goto MENU
+)
+if "%opcion%"=="2" (
+    call :LIMPIEZA_BASICA
+    call :TAREA_FINALIZADA
+    goto MENU
+)
+if "%opcion%"=="3" (
+    call :LIMPIEZA_COMPLETA
+    call :REINICIAR_WINUP
+    call :TAREA_FINALIZADA --no-pause
+    goto MENU
+)
+if "%opcion%"=="4" (
+    call :ANALISIS_COMPLETO
+    goto MENU
+)
 if "%opcion%"=="5" goto HERRAMIENTAS_AVANZADAS
 if "%opcion%"=="6" goto ACTUALIZAR
 if "%opcion%"=="7" goto ACERCA_DE
@@ -93,7 +109,6 @@ sfc /scannow
 echo Revisando imagen de Windows...
 DISM /Online /Cleanup-Image /CheckHealth
 DISM /Online /Cleanup-Image /RestoreHealth
-echo. & echo [OK] Tarea de Revision completada. & pause
 exit /b
 
 :REINICIAR_WINUP
@@ -145,7 +160,6 @@ for %%d in (%drives_to_check%) do (
         echo.
     )
 )
-echo. & echo [OK] Tarea de Limpieza Basica completada. & pause
 exit /b
 
 
@@ -155,7 +169,7 @@ echo [TAREA] Limpieza completa: temporales, red, firewall y mas...
 echo.
 REM --- Comprobacion Inteligente de Bateria ---
 echo [INFO] Verificando estado de la alimentacion electrica...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "if (Get-CimInstance -ClassName Win32_Battery -ErrorAction SilentlyContinue) { $chargeStatus = (Get-CimInstance -ClassName Win32_Battery).BatteryStatus; if ($chargeStatus -ne 2) { Write-Host '[!] ADVERTENCIA: La laptop esta funcionando con bateria.'; pause } else { Write-Host '[OK]   La laptop esta conectada a la corriente.' } } else { Write-Host '[OK]   PC de escritorio detectada.' }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "if (Get-CimInstance -ClassName Win32_Battery -ErrorAction SilentlyContinue) { $chargeStatus = (Get-CimInstance -ClassName Win32_Battery).BatteryStatus; if ($chargeStatus -ne 2) { Write-Host '[!] ADVERTENCIA: La laptop esta funcionando con bateria.' } else { Write-Host '[OK]   La laptop esta conectada a la corriente.' } } else { Write-Host '[OK]   PC de escritorio detectada.' }"
 echo.
 echo Restableciendo DNS y red...
 ipconfig /flushdns & netsh int ip reset & netsh winsock reset & netsh advfirewall reset
@@ -170,9 +184,6 @@ tasklist | findstr /I /C:"malware" /C:"virus"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_StartupCommand | Select-Object Caption, Command, User | Format-Table -AutoSize"
 echo Comprobando estado fisico del disco...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PhysicalDisk | ForEach-Object { Write-Host \"$($_.FriendlyName): $($_.OperationalStatus)\" }"
-echo Reiniciando servicios de actualizacion de Windows...
-call :REINICIAR_WINUP
-echo. & echo [OK] Tarea de Limpieza Completa finalizada. & pause
 exit /b
 
 
@@ -181,11 +192,22 @@ cls
 echo [TAREA] Analisis completo: ejecutando TODO el mantenimiento...
 echo.
 call :REVISION
-call :REINICIAR_WINUP
 call :LIMPIEZA_BASICA
 call :LIMPIEZA_COMPLETA
-echo. & echo [OK] Analisis completo finalizado. & pause
-goto MENU
+call :REINICIAR_WINUP
+call :TAREA_FINALIZADA --no-pause
+exit /b
+
+
+:TAREA_FINALIZADA
+echo.
+echo [OK] Tarea finalizada.
+if /i "%~1"=="--no-pause" (
+    exit /b
+)
+pause
+exit /b
+
 
 
 :HERRAMIENTAS_AVANZADAS
@@ -208,6 +230,7 @@ if "%adv_opcion%"=="3" goto PRIVACY_MODULE
 if "%adv_opcion%"=="4" goto MAXIMO_RENDIMIENTO
 if "%adv_opcion%"=="5" goto MENU
 goto HERRAMIENTAS_AVANZADAS
+
 
 :STARTUP_MANAGER
 cls
@@ -242,6 +265,7 @@ if "%startup_opcion%"=="4" goto HERRAMIENTAS_AVANZADAS
 pause
 goto STARTUP_MANAGER
 
+
 :DRIVER_CLEANER
 cls
 echo =============================================================
@@ -271,6 +295,7 @@ echo [OK]   Proceso iniciado. Windows limpiara los archivos en segundo plano.
 echo.
 pause
 goto HERRAMIENTAS_AVANZADAS
+
 
 :PRIVACY_MODULE
 cls
@@ -306,6 +331,7 @@ echo        cambios surtan efecto.
 echo.
 pause
 goto HERRAMIENTAS_AVANZADAS
+
 
 :MAXIMO_RENDIMIENTO
 cls
@@ -343,6 +369,7 @@ if %errorlevel% equ 0 (
 ) else (
     echo [ERROR] No se pudo activar ningun plan de alto rendimiento.
 )
+
 
 :RendimientoFin
 echo.

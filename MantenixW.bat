@@ -72,7 +72,7 @@ echo   7. Acerca de
 echo   8. Historial de actualizaciones
 echo   9. Salir
 echo.
-set /p opcion=Selecciona una opcion:
+set /p opcion=Selecciona una opcion: 
 
 if "%opcion%"=="1" call :REVISION
 if "%opcion%"=="2" call :LIMPIEZA_BASICA
