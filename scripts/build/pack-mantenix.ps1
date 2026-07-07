@@ -1,21 +1,43 @@
 param(
-    [string]$RepositoryRoot = (Get-Location).Path
+    [string]$RepositoryRoot = (Get-Location).Path,
+    [string]$BatchPath
 )
 
 $ErrorActionPreference = 'Stop'
 
 $root = Resolve-Path $RepositoryRoot
-$batPath = Join-Path $root 'MantenixWforEXE.bat'
 $iconPath = Join-Path $root 'icon.ico'
 $outPath = Join-Path $root 'MantenixW.exe'
 
-if (-not (Test-Path $batPath)) {
-    throw "No se encontró el batch: $batPath"
+$batchCandidates = @()
+if ($BatchPath) {
+    $batchCandidates += $BatchPath
+}
+$batchCandidates += @(
+    (Join-Path $root 'MantenixWforEXE.bat'),
+    (Join-Path $root 'MantenixWbeta.bat'),
+    (Join-Path $root 'MantenixW.bat')
+)
+
+$batPath = $null
+foreach ($candidate in $batchCandidates) {
+    if ($candidate -and (Test-Path $candidate)) {
+        $batPath = (Resolve-Path $candidate).Path
+        break
+    }
+}
+
+if (-not $batPath) {
+    throw "No se encontró un batch válido para empaquetar en $root"
 }
 
 if (-not (Test-Path $iconPath)) {
     throw "No se encontró el icono: $iconPath"
 }
+
+$versionMatch = Select-String -Path $batPath -Pattern '^\s*set\s+"AppVersion=(?<version>[^\"]+)"' | Select-Object -First 1
+$AppVersion = if ($versionMatch) { $versionMatch.Matches[0].Groups['version'].Value.Trim() } else { '0.0.0' }
+$AuthorName = 'RichyKunBv'
 
 $batToExe = Get-Command 'bat-to-exe' -ErrorAction SilentlyContinue
 if (-not $batToExe) {
@@ -97,5 +119,20 @@ if (-not (Test-Path $outPath)) {
     throw "El proceso no generó $outPath"
 }
 
+$rcedit = Get-Command 'rcedit' -ErrorAction SilentlyContinue
+if (-not $rcedit) {
+    $choco = Get-Command 'choco' -ErrorAction SilentlyContinue
+    if ($choco) {
+        & choco install rcedit -y --no-progress
+        $rcedit = Get-Command 'rcedit' -ErrorAction SilentlyContinue
+    }
+}
+
+if ($rcedit) {
+    & $rcedit $outPath --set-icon $iconPath --set-version-string FileDescription 'MantenixW' --set-version-string ProductName 'MantenixW' --set-version-string CompanyName $AuthorName --set-version-string LegalCopyright "© $AuthorName" --set-version-string FileVersion $AppVersion --set-version-string ProductVersion $AppVersion
+}
+
 Remove-Item $workDir -Recurse -Force
 Write-Host "Ejecutable generado: $outPath"
+Write-Host "Versión aplicada: $AppVersion"
+Write-Host "Autor aplicado: $AuthorName"

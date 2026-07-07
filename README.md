@@ -1,8 +1,8 @@
-# 🧰 Mantenix v3.0
+# 🧰 Mantenix v3.1
 
 **Autor:** [RichyKunBv](https://github.com/RichyKunBv)  
 **Repositorio:** `Mantenix-Windows-Edition`  
-**Versión Actual:** 3.0
+**Versión Actual:** 3.1
 
 ---
 
@@ -12,18 +12,19 @@
 
 ---
 
-### ✨ Características Principales de la v3.0
+### ✨ Características Principales de la v3.1
 
 * **Optimización Inteligente:** Mantenix detecta automáticamente si tus unidades de almacenamiento son **HDD o SSD**. Aplica la desfragmentación tradicional a los discos duros y la optimización TRIM (más segura y recomendada) a las unidades de estado sólido.
 * **Ejecución Segura:** Comprueba si tiene permisos de administrador al inicio y, si no, intenta re-lanzarse para asegurar que todas las funciones operen correctamente.
-* **Herramientas Avanzadas:** Incluye un nuevo módulo con herramientas para gestionar programas de arranque, limpiar drivers antiguos y mejorar tu privacidad.
+* **Herramientas Avanzadas:** Incluye un módulo con herramientas para gestionar programas de arranque, limpiar drivers antiguos, mejorar tu privacidad y activar el plan de máximo rendimiento.
 * **Actualizador Integrado:** Revisa si hay nuevas versiones en GitHub y te permite actualizar la aplicación fácilmente.
+* **Experiencia Mejorada:** Añade secciones para revisión del sistema, limpieza básica, limpieza completa, análisis completo y un historial de actualizaciones más completo.
 
 ---
 
 ### 🚀 Instrucciones de Uso
 
-1.  Ve a la sección de **[Releases](https://github.com/RichyKunBv/Mantenix-Windows-Edition/releases)** y descarga la última versión (`MantenixW.bat` o `Mantenix.exe`).
+1.  Ve a la sección de **[Releases](https://github.com/RichyKunBv/Mantenix-Windows-Edition/releases/latest)** y descarga la última versión disponible. El script original está en `MantenixW.bat` y, cuando se publique, también encontrarás el archivo compilado `Mantenix.exe` en las Releases.
 2.  Tu navegador podría mostrar una advertencia de seguridad por ser un archivo poco común. Simplemente haz clic en los tres puntos y selecciona "Conservar". ¡Es seguro!
 
     ![Advertencia de descarga del navegador](https://github.com/user-attachments/assets/8ab94073-82e5-4c8f-8468-c8b43dbb173a)
@@ -36,7 +37,7 @@
 
 ---
 
-### 📋 Opciones del Menú v3.0
+### 📋 Opciones del Menú v3.1
 
 <img width="591" height="508" alt="image" src="https://github.com/user-attachments/assets/4a3f1967-acda-4cbc-a348-4ec2a8f129c6" />
 
@@ -58,9 +59,19 @@ Abre un sub-menú con nuevas y potentes utilidades:
 * **Gestor de Arranque:** Lista los programas que inician con Windows y te da acceso a las herramientas del sistema para gestionarlos.
 * **Limpieza de Drivers:** Lanza la utilidad de Windows para eliminar de forma segura paquetes de controladores antiguos y liberar espacio.
 * **Módulo de Privacidad:** Aplica cambios para reducir la telemetría y recolección de datos de Windows.
+* **Máximo Rendimiento:** Activa el plan de energía de alto rendimiento para mejorar el comportamiento del sistema.
 
 #### 6. ⬆️ Actualizar Mantenix
 Comprueba si hay una nueva versión en GitHub y te guía en el proceso de actualización.
+
+#### 7. ℹ️ Acerca de
+Muestra información básica del proyecto y del autor.
+
+#### 8. 📝 Historial de actualizaciones
+Muestra los cambios más relevantes de cada versión.
+
+#### 9. 🚪 Salir
+Cierra el programa y abre la página del proyecto en GitHub.
 
 <img width="576" height="332" alt="image" src="https://github.com/user-attachments/assets/9fdefb35-1869-4131-8d54-d592ac695942" />
 
@@ -76,7 +87,7 @@ Cierra el programa y abre la página del proyecto en GitHub.
 * **Puntos de Restauración:** La limpieza completa crea un punto de restauración, pero siempre es buena idea tener un respaldo de tus datos importantes.
 * **Diferencia entre `.bat` y `.exe`:**
     * `MantenixW.bat`: Es el script de código abierto. Su actualizador es **totalmente automático** (se reemplaza a sí mismo).
-    * `Mantenix.exe`: Es el script compilado para mayor comodidad. Por seguridad y para evitar falsos positivos de antivirus, su actualizador **descarga la nueva versión** en tu carpeta de "Descargas" y te avisa para que tú la reemplaces manualmente.
+    * `Mantenix.exe`: Es el archivo compilado para mayor comodidad. Se publica en las **Releases** del repositorio y, por seguridad y para evitar falsos positivos de antivirus, su actualizador **descarga la nueva versión** en tu carpeta de "Descargas" y te avisa para que tú la reemplaces manualmente.
 * **Conexión a Internet:** La función de actualizar necesita conexión a internet para contactar con GitHub.
 
 ---
