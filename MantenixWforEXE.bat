@@ -6,7 +6,7 @@ color 0A
 REM --- ========================================================== ---
 REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
-set "AppVersion=3.1.1"
+set "AppVersion=3.1"
 
 
 REM --- ========================================================== ---
@@ -386,9 +386,8 @@ echo =============================================================
 echo                   DESCARGANDO NUEVA VERSION
 echo =============================================================
 echo.
-set "versionTag=v%latestVersion%"
 set "fileName=MantenixW.exe"
-set "releaseURL=https://github.com/%repoUser%/%repoName%/releases/download/%versionTag%/%fileName%"
+set "releaseURL=https://github.com/%repoUser%/%repoName%/releases/latest/download/%fileName%"
 set "downloadPath=%USERPROFILE%\Downloads\%fileName%"
 echo [INFO] Descargando el archivo: %fileName%
 echo [INFO] Guardando en: %USERPROFILE%\Downloads
