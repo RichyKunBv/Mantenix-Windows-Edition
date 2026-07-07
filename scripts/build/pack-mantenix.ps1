@@ -187,7 +187,7 @@ internal static class Program
 
     Push-Location $launcherProjectDir
     try {
-        & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:UseAppHost=true -p:SelfContained=false -o $publishDir
+        & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=false -p:UseAppHost=true -p:SelfContained=false -p:PublishDir=$publishDir
         if ($LASTEXITCODE -ne 0) {
             throw "dotnet publish terminó con código de salida $LASTEXITCODE"
         }
@@ -203,28 +203,28 @@ internal static class Program
     }
 
     $fallbackExe = $null
-    $candidatePaths = @(
-        (Join-Path $publishDir 'MantenixW.exe'),
-        (Join-Path $publishDir 'MantenixW'),
-        (Join-Path $publishDir 'MantenixWLauncher.exe'),
-        (Join-Path $publishDir 'MantenixWLauncher'),
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixW.exe'),
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixW'),
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixWLauncher.exe'),
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish/MantenixWLauncher')
+    $searchRoots = @(
+        $publishDir,
+        $launcherProjectDir,
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64'),
+        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish')
     )
 
-    foreach ($candidate in $candidatePaths) {
-        if ($candidate -and (Test-Path $candidate)) {
-            $fallbackExe = $candidate
-            break
+    foreach ($searchRoot in $searchRoots) {
+        if (-not $searchRoot) {
+            continue
         }
-    }
 
-    if (-not $fallbackExe) {
-        $fallbackExe = @(Get-ChildItem -Path $workDir -Recurse -File -Filter '*.exe' -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -match 'MantenixW|MantenixWLauncher' } |
-            Select-Object -ExpandProperty FullName -First 1)
+        if (Test-Path $searchRoot) {
+            $foundExe = @(Get-ChildItem -Path $searchRoot -Recurse -File -Filter '*.exe' -ErrorAction SilentlyContinue |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -ExpandProperty FullName -First 1)
+
+            if ($foundExe) {
+                $fallbackExe = $foundExe
+                break
+            }
+        }
     }
 
     if (-not $fallbackExe) {
