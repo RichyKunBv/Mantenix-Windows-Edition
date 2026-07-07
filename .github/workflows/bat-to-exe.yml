@@ -1,0 +1,49 @@
+name: Generar MantenixW.exe para Windows
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-exe:
+    name: Crear ejecutable Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Obtener código fuente
+        uses: actions/checkout@v4
+
+      - name: Instalar convertidor de Batch a EXE
+        shell: powershell
+        run: |
+          choco install bat-to-exe-converter -y --no-progress
+
+      - name: Crear MantenixW.exe con icono y elevación
+        shell: powershell
+        run: |
+          ./scripts/build/pack-mantenix.ps1 -RepositoryRoot $PWD
+
+      - name: Comprobar resultado
+        shell: powershell
+        run: |
+          if (-not (Test-Path ./MantenixW.exe)) {
+            throw "No se generó ./MantenixW.exe"
+          }
+          Get-Item ./MantenixW.exe | Select-Object Name, Length, LastWriteTime
+
+      - name: Subir archivo a GitHub Releases
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.workspace }}/MantenixW.exe
+
+      - name: Subir artefacto manual
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MantenixW.exe
+          path: ${{ github.workspace }}/MantenixW.exe
