@@ -1,0 +1,53 @@
+# Compilaciones y artefactos de salida
+**/bin/
+**/obj/
+TestResults/
+artifacts/
+
+# Archivos de configuración de usuario local
+*.user
+*.suo
+*.userosscache
+*.csproj.user
+*.sln.docstates
+*.sln.DotSettings.user
+
+# Visual Studio y Rider
+.vs/
+.idea/
+*.ReSharper*
+*.DotSettings.user
+*.DotSettings
+
+# Archivos basura de macOS, ermano .DS_Store es muy molesto
+.DS_Store
+**/.DS_Store
+.AppleDouble
+**/.AppleDouble
+.LSOverride
+**/.LSOverride
+Icon?
+Icon
+._*
+.fseventsd/
+.Spotlight-V100/
+.Trashes/
+.VolumeIcon.icns
+
+# Logs y cachés
+*.log
+*.cache
+
+# Archivos temporales de VS y editor
+*.tmp
+*.temp
+~$*
+*.userprefs
+
+# Paquetes y dependencias restauradas
+packages/
+
+# Binarios y símbolos generados
+*.pdb
+*.mdb
+*.cache
