@@ -182,50 +182,29 @@ internal static class Program
     $launcherSource = $launcherSource.Replace('__BATCH_PATH__', $batTemp)
     Set-Content -Path (Join-Path $launcherProjectDir 'Program.cs') -Value $launcherSource -Encoding UTF8
 
-    $publishDir = Join-Path $workDir 'publish'
-    New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
+    $buildOutDir = Join-Path $workDir 'build-output'
+    New-Item -ItemType Directory -Path $buildOutDir -Force | Out-Null
 
     Push-Location $launcherProjectDir
     try {
-        & $dotnet publish -c Release -r win-x64 -p:PublishSingleFile=false -p:UseAppHost=true -p:SelfContained=false -p:PublishDir=$publishDir
+        & $dotnet build -c Release -r win-x64 -p:UseAppHost=true -p:SelfContained=false --output $buildOutDir
         if ($LASTEXITCODE -ne 0) {
-            throw "dotnet publish terminó con código de salida $LASTEXITCODE"
+            throw "dotnet build terminó con código de salida $LASTEXITCODE"
         }
     }
     finally {
         Pop-Location
     }
 
-    $generatedFiles = @(Get-ChildItem -Path $workDir -Recurse -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
-    Write-Host "Archivos generados por dotnet publish:"
+    $generatedFiles = @(Get-ChildItem -Path $buildOutDir -Recurse -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    Write-Host "Archivos generados por dotnet build:"
     foreach ($file in $generatedFiles) {
         Write-Host " - $file"
     }
 
-    $fallbackExe = $null
-    $searchRoots = @(
-        $publishDir,
-        $launcherProjectDir,
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64'),
-        (Join-Path $launcherProjectDir 'bin/Release/net8.0/win-x64/publish')
-    )
-
-    foreach ($searchRoot in $searchRoots) {
-        if (-not $searchRoot) {
-            continue
-        }
-
-        if (Test-Path $searchRoot) {
-            $foundExe = @(Get-ChildItem -Path $searchRoot -Recurse -File -Filter '*.exe' -ErrorAction SilentlyContinue |
-                Sort-Object LastWriteTime -Descending |
-                Select-Object -ExpandProperty FullName -First 1)
-
-            if ($foundExe) {
-                $fallbackExe = $foundExe
-                break
-            }
-        }
-    }
+    $fallbackExe = @(Get-ChildItem -Path $buildOutDir -Recurse -File -Filter '*.exe' -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -ExpandProperty FullName -First 1)
 
     if (-not $fallbackExe) {
         throw "No se pudo generar el ejecutable alternativo con dotnet. Archivos generados: $($generatedFiles -join ', ')"
