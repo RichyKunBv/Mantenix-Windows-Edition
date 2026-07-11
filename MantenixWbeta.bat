@@ -74,31 +74,36 @@ echo   9. Salir
 echo.
 set /p opcion=Selecciona una opcion:
 
-if "%opcion%"=="1" (
-    call :REVISION
-    call :TAREA_FINALIZADA
-    goto MENU
-)
-if "%opcion%"=="2" (
-    call :LIMPIEZA_BASICA
-    call :TAREA_FINALIZADA
-    goto MENU
-)
-if "%opcion%"=="3" (
-    call :LIMPIEZA_COMPLETA
-    call :REINICIAR_WINUP
-    call :TAREA_FINALIZADA --no-pause
-    goto MENU
-)
-if "%opcion%"=="4" (
-    call :ANALISIS_COMPLETO
-    goto MENU
-)
+REM --- Rutas directas sin parentesis para evitar colapso de bloque ---
+if "%opcion%"=="1" goto RUN_OP1
+if "%opcion%"=="2" goto RUN_OP2
+if "%opcion%"=="3" goto RUN_OP3
+if "%opcion%"=="4" goto RUN_OP4
 if "%opcion%"=="5" goto HERRAMIENTAS_AVANZADAS
 if "%opcion%"=="6" goto ACTUALIZAR
 if "%opcion%"=="7" goto ACERCA_DE
 if "%opcion%"=="8" goto HISTORIAL_ACTUALIZACIONES
 if "%opcion%"=="9" goto SALIR
+goto MENU
+
+:RUN_OP1
+call :REVISION
+call :TAREA_FINALIZADA
+goto MENU
+
+:RUN_OP2
+call :LIMPIEZA_BASICA
+call :TAREA_FINALIZADA
+goto MENU
+
+:RUN_OP3
+call :LIMPIEZA_COMPLETA
+call :REINICIAR_WINUP
+call :TAREA_FINALIZADA --no-pause
+goto MENU
+
+:RUN_OP4
+call :ANALISIS_COMPLETO
 goto MENU
 
 
@@ -118,6 +123,9 @@ net stop cryptSvc
 net stop bits
 net stop msiserver
 
+if exist C:\Windows\SoftwareDistribution.old rmdir /s /q C:\Windows\SoftwareDistribution.old
+if exist C:\Windows\System32\catroot2.old rmdir /s /q C:\Windows\System32\catroot2.old
+
 ren C:\Windows\SoftwareDistribution SoftwareDistribution.old
 ren C:\Windows\System32\catroot2 catroot2.old
 
@@ -125,7 +133,7 @@ net start wuauserv
 net start cryptSvc
 net start bits
 net start msiserver
-exit /b         
+exit /b      
 
 
 :LIMPIEZA_BASICA
@@ -195,7 +203,7 @@ call :REVISION
 call :LIMPIEZA_BASICA
 call :LIMPIEZA_COMPLETA
 call :REINICIAR_WINUP
-call :TAREA_FINALIZADA --no-pause
+call :TAREA_FINALIZADA
 exit /b
 
 
