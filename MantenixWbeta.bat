@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Mantenix v3.1.1 Beta - por RichyKunBv
+title Mantenix v3.1.1 Beta RC2 - por RichyKunBv
 color 0A
 
 REM --- ========================================================== ---
 REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
-set "AppVersion=3.1.1"
+set "AppVersion=3.1.1.1"
 
 
 REM --- ========================================================== ---
@@ -85,6 +85,8 @@ if "%opcion%"=="7" goto ACERCA_DE
 if "%opcion%"=="8" goto HISTORIAL_ACTUALIZACIONES
 if "%opcion%"=="9" goto SALIR
 goto MENU
+
+REM Nota: calajo, los () tronaban todo, tuve que hacer esa leve reestructuracion
 
 :RUN_OP1
 call :REVISION

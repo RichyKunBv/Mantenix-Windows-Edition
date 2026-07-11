@@ -7,7 +7,8 @@ set -euo pipefail
 # El script es solo para Linux y MacOS, no es compatible con Windows.
 
 nombre="Mantenix-Windows-Edition"
-repo_url="https://github.com/RichyKunBv/$nombre.git"
+
+
 repos_base="$HOME/Repos"
 old_location="$HOME/$nombre"
 ubicacion=""

@@ -100,7 +100,8 @@ if ($tool) {
         '/icon', $iconPath,
         '/x86',
         '/nopause',
-        '/silent'
+        '/silent',
+        '/admin'
     )
 
     & $tool @argList
@@ -130,6 +131,7 @@ else {
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 </Project>
 '@
@@ -139,23 +141,27 @@ else {
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 internal static class Program
 {
     private static int Main(string[] args)
     {
-        string batchPath = @"__BATCH_PATH__";
-        if (!File.Exists(batchPath))
-        {
-            Console.Error.WriteLine($"No se encontró el archivo por lotes: {batchPath}");
-            return 1;
-        }
+        string base64Bat = "__BASE64_BAT__";
+        byte[] batBytes = Convert.FromBase64String(base64Bat);
+        string batContent = Encoding.UTF8.GetString(batBytes);
+        
+        string tempDir = Path.Combine(Path.GetTempPath(), "MantenixW_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+        string batchPath = Path.Combine(tempDir, "MantenixWforEXE.bat");
+        
+        File.WriteAllText(batchPath, batContent, Encoding.UTF8);
 
         var startInfo = new ProcessStartInfo
         {
             FileName = "cmd.exe",
             Arguments = $"/c \"{batchPath}\"",
-            WorkingDirectory = Path.GetDirectoryName(batchPath) ?? Environment.CurrentDirectory,
+            WorkingDirectory = tempDir,
             UseShellExecute = false,
             CreateNoWindow = true
         };
@@ -176,10 +182,22 @@ internal static class Program
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+            catch { }
+        }
     }
 }
 '@
-    $launcherSource = $launcherSource.Replace('__BATCH_PATH__', $batTemp)
+    $batBytes = [System.Text.Encoding]::UTF8.GetBytes($batContent)
+    $batBase64 = [Convert]::ToBase64String($batBytes)
+    $launcherSource = $launcherSource.Replace('__BASE64_BAT__', $batBase64)
+    Copy-Item -Path (Join-Path $workDir 'app.manifest') -Destination (Join-Path $launcherProjectDir 'app.manifest') -Force
     Set-Content -Path (Join-Path $launcherProjectDir 'Program.cs') -Value $launcherSource -Encoding UTF8
 
     $buildOutDir = Join-Path $workDir 'build-output'

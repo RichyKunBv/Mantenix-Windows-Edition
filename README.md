@@ -105,5 +105,6 @@ Este proyecto ha sido probado y verificado en las siguientes configuraciones de 
 | Windows 10 Pro | x86_64 / i5-4200M | 16 GB | Actualizaciones de Seguridad Extendidas |
 | Windows 10 Pro | x86_64 / i5-3230M | 12 GB | Actualizaciones de Seguridad Extendidas |
 | Windows 11 Pro | ARM / M1 | 4 GB | Maquina virtual VMware Fusion |
+| Windows 11 Pro | x86_64 / i3-1115G4 | 8 GB | Prueba de beta 3.1.1, vuelca la memoria al usar la opcion 4 |
 
 </details>
