@@ -162,8 +162,8 @@ internal static class Program
             FileName = "cmd.exe",
             Arguments = $"/c \"{batchPath}\"",
             WorkingDirectory = tempDir,
-            UseShellExecute = false,
-            CreateNoWindow = true
+            UseShellExecute = true,
+            CreateNoWindow = false
         };
 
         try
