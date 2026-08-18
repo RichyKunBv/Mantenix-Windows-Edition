@@ -1,12 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-title Mantenix v3.1.1 Beta RC2 - por RichyKunBv
+title Mantenix v4 Beta RC3 - por RichyKunBv
 color 0A
 
 REM --- ========================================================== ---
 REM ---                 VARIABLE DE VERSION UNICA                  ---
 REM --- ========================================================== ---
-set "AppVersion=3.1.1.1"
+set "AppVersion=4.0"
 
 
 REM --- ========================================================== ---
@@ -182,11 +182,15 @@ echo [INFO] Verificando estado de la alimentacion electrica...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "if (Get-CimInstance -ClassName Win32_Battery -ErrorAction SilentlyContinue) { $chargeStatus = (Get-CimInstance -ClassName Win32_Battery).BatteryStatus; if ($chargeStatus -ne 2) { Write-Host '[!] ADVERTENCIA: La laptop esta funcionando con bateria.' } else { Write-Host '[OK]   La laptop esta conectada a la corriente.' } } else { Write-Host '[OK]   PC de escritorio detectada.' }"
 echo.
 echo Restableciendo DNS y red...
-ipconfig /flushdns & netsh int ip reset & netsh winsock reset & netsh advfirewall reset
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Clear-DnsClientCache"
 echo Ejecutando Liberador de espacio...
 cleanmgr /sagerun:1
-echo Borrando temporales...
+echo Limpiando componentes obsoletos de Windows (WinSxS)...
+DISM.exe /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+echo Borrando temporales y caches selectivas...
 del /s /q %temp%\*.* 2>nul & del /s /q C:\Windows\Temp\*.* 2>nul
+wsreset.exe -i
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Remove-Item -Path \"$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*\" -Recurse -Force -ErrorAction SilentlyContinue"
 echo Creando punto de restauracion...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Checkpoint-Computer -Description 'Mantenix - Limpieza Completa' -RestorePointType MODIFY_SETTINGS" >nul 2>&1
 echo Verificando procesos y arranque...
@@ -477,6 +481,7 @@ echo =============================================================
 echo                 HISTORIAL DE ACTUALIZACIONES
 echo =============================================================
 echo.
+echo   v4.0 - Limpieza de WinSxS, red moderna (PS) y purga de caches
 echo   v3.1 - Se mejoro la estructura y puedes activar el maxmio rendimiento
 echo   v3.0 - Herramientas avanzadas y aplicacion mas inteligente
 echo   v2.1 - Autoactualizacion de la aplicacion
